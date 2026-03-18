@@ -1,0 +1,53 @@
+name: Deploy Streamlit App (GHCR → Azure Container Apps)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # Required to push to GHCR
+      id-token: write   # Required for Azure OIDC login
+
+    steps:
+      # 1️⃣ Checkout the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Login to GHCR
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # 3️⃣ Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:latest \
+                       -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+
+      # 4️⃣ Push Docker image to GHCR
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      # 5️⃣ Login to Azure
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_SUBSCRIPTION_ID }}
+
+      # 6️⃣ Deploy to Azure Container Apps
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          containerAppName: streamlit-helloworld
+          resourceGroup: myResourceGroup
+          imageToDeploy: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          ingress: external
+          targetPort: 8501

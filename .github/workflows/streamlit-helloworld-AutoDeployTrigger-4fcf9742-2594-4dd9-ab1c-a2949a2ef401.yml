@@ -3,12 +3,12 @@ name: Trigger auto deployment for streamlit-helloworld
 # When this action will be executed
 on:
   # Automatically trigger it when detected changes in repo
-  push:
-    branches: 
-      [ main ]
-    paths:
-    - '**'
-    - '.github/workflows/streamlit-helloworld-AutoDeployTrigger-4fcf9742-2594-4dd9-ab1c-a2949a2ef401.yml'
+  # push:
+  #   branches: 
+  #     [ main ]
+  #   paths:
+  #   - '**'
+  #   - '.github/workflows/streamlit-helloworld-AutoDeployTrigger-4fcf9742-2594-4dd9-ab1c-a2949a2ef401.yml'
 
   # Allow manual trigger 
   workflow_dispatch:      
