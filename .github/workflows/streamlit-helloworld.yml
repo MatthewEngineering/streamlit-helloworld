@@ -49,6 +49,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build   # wait for build job
+    permissions:
+      id-token: write
+      contents: read
     steps:
       # Checkout (optional if you need repo context)
       - name: Checkout repo
@@ -58,7 +61,6 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          auth-type: oidc
           client-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_SUBSCRIPTION_ID }}
