@@ -58,6 +58,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
+          auth-type: oidc
           client-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.STREAMLITHELLOWORLD_AZURE_SUBSCRIPTION_ID }}
