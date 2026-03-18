@@ -1,4 +1,4 @@
-name: Deploy Streamlit App (GHCR → Azure Container Apps)
+name: Deploy Streamlit to Azure
 
 on:
   push:
@@ -10,29 +10,29 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write   # Required to push to GHCR
-      id-token: write   # Required for Azure OIDC login
+      packages: write   # for GHCR
+      id-token: write   # for Azure OIDC login
 
     steps:
-      # 1️⃣ Checkout the repo
-      - name: Checkout code
+      # 1️⃣ Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2️⃣ Login to GHCR
-      - name: Login to GitHub Container Registry
+      # 2️⃣ Login to GitHub Container Registry (GHCR)
+      - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       # 3️⃣ Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository | lower }}:latest \
-                       -t ghcr.io/${{ github.repository | lower }}:${{ github.sha }} .
+          docker build -t ghcr.io/matthewengineering/streamlit-helloworld:latest \
+                       -t ghcr.io/matthewengineering/streamlit-helloworld:${{ github.sha }} .
 
       # 4️⃣ Push Docker image to GHCR
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository | lower }}:latest
-          docker push ghcr.io/${{ github.repository | lower }}:${{ github.sha }}
+          docker push ghcr.io/matthewengineering/streamlit-helloworld:latest
+          docker push ghcr.io/matthewengineering/streamlit-helloworld:${{ github.sha }}
 
       # 5️⃣ Login to Azure
       - name: Azure Login
@@ -48,6 +48,6 @@ jobs:
         with:
           containerAppName: streamlit-helloworld
           resourceGroup: myResourceGroup
-          imageToDeploy: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          imageToDeploy: ghcr.io/matthewengineering/streamlit-helloworld:${{ github.sha }}
           ingress: external
           targetPort: 8501
