@@ -25,14 +25,14 @@ jobs:
       # 3️⃣ Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:latest \
-                       -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+          docker build -t ghcr.io/${{ github.repository | lower }}:latest \
+                       -t ghcr.io/${{ github.repository | lower }}:${{ github.sha }} .
 
       # 4️⃣ Push Docker image to GHCR
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository | lower }}:latest
+          docker push ghcr.io/${{ github.repository | lower }}:${{ github.sha }}
 
       # 5️⃣ Login to Azure
       - name: Azure Login
